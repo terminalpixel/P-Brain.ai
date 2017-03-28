@@ -1,23 +1,26 @@
-const intent = () => ({
-    keywords: ['what time is it', 'what is the time'],
-    module: 'time'
-})
+const PBrainSkill = require('../skill');
 
-function * time_resp(query) {
-    const time = new Date().toLocaleTimeString('en-GB', {
-        hour: 'numeric',
-        minute: 'numeric'
-    })
+class TimeSkill extends PBrainSkill {
+    constructor() {
+        super('time');
+    }
 
-    return {text: 'It is ' + time}
+    keywords() {
+        return ['what time is it', 'what is the time']
+    }
+
+    examples() {
+        return ['What time is it?', 'What\'s the current time?', 'Tell me the time.'];
+    }
+
+    * get(query) {
+        const time = new Date().toLocaleTimeString('en-GB', {
+            hour: 'numeric',
+            minute: 'numeric'
+        })
+
+        return {text: 'It is ' + time}
+    }
 }
 
-const examples = () => (
-    ['What time is it?', 'What\'s the current time?', 'Tell me the time.']
-)
-
-module.exports = {
-    get: time_resp,
-    intent,
-    examples
-}
+module.exports = TimeSkill;

@@ -1,17 +1,13 @@
-function * hello_resp() {
-    return {text: 'Hello World'}
+const PBrainSkill = require('../skill');
+
+class HelloWorldSkill extends PBrainSkill {
+    constructor() {
+        super('hello');
+    }
+
+    * get(query) {
+        return {text: 'Hello World'}
+    }
 }
 
-const intent = () => ({
-    keywords: [], module: 'hello'
-})
-
-const examples = () => (
-    []
-)
-
-module.exports = {
-    get: hello_resp,
-    intent,
-    examples
-}
+module.exports = HelloWorldSkill;

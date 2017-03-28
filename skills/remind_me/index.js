@@ -1,18 +1,22 @@
-function hard_rule(query, breakdown) {
-    return query.trim().startsWith('remind me to')
+const PBrainSkill = require('../skill');
+
+class ReminderSkill extends PBrainSkill {
+    constructor() {
+        super('remind');
+    }
+
+    hardRule(query, breakdown) {
+        return query.trim().startsWith('remind me to')
+    }
+
+    examples() {
+        return ['Remind me to take out the bins.'];
+    }
+
+    * get(query) {
+        query = query.replace('remind me to', '').trim()
+        return {text: `It's time to ${query}.`}
+    }
 }
 
-function * reminder_resp(query) {
-    query = query.replace('remind me to', '').trim()
-    return {text: `It's time to ${query}.`}
-}
-
-const examples = () => (
-    ['Remind me to take out the bins.']
-)
-
-module.exports = {
-    get: reminder_resp,
-    hard_rule,
-    examples
-}
+module.exports = ReminderSkill;

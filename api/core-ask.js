@@ -23,11 +23,8 @@ function * train_recognizer(skills) {
     loaded_skills = skills
     // train a classifier
     skills.map(skill => {
-        if (skill.intent) {
-            const intent_funct = skill.intent
-            const intent = intent_funct()
-
-            intent.keywords.map(keyword => {
+        if (skill.keywords) {
+            skill.keywords().map(keyword => {
                 classifier.addDocument(strip(keyword), skill.name)
             })
         }

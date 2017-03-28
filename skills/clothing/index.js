@@ -1,3 +1,4 @@
+const PBrainSkill = require('../skill');
 const request = require('co-request')
 const util = require('util')
 
@@ -11,55 +12,58 @@ const type_wardrobe = {
     mist: 'a hat'
 }
 
-function contains_key(string, keyword) {
-    if (string.toUpperCase().includes(keyword.toUpperCase())) {
-        return true
+class ClothingSkill extends PBrainSkill {
+    constructor() {
+        super('clothing');
     }
-    return false
-}
 
-function * clothing_resp() {
-    let response = 'Looks like <condition>, better wear <clothes>'
-    let clothes = 'a jacket'
-    const key = yield global.db.getSkillValue('weather', 'openweathermap')
-    let data = yield request(util.format(api_opnw, key), {
-        headers: {
-            'Content-type': 'application/json'
+    keywords() {
+        return ['wear today', 'clothes']
+    }
+
+    examples() {
+        return ['should I wear']
+    }
+
+    * get(query) {
+        let response = 'Looks like <condition>, better wear <clothes>'
+        let clothes = 'a jacket'
+        const key = yield global.db.getSkillValue('weather', 'openweathermap')
+        let data = yield request(util.format(api_opnw, key), {
+            headers: {
+                'Content-type': 'application/json'
+            }
+        })
+
+        data = JSON.parse(data.body)
+
+        const condition = data.weather[0].main
+
+        if (this.contains_key(condition, 'rain') || this.contains_key(condition, 'shower')) {
+            clothes = type_wardrobe.rain
+        } else if (this.contains_key(condition, 'snow')) {
+            clothes = type_wardrobe.snow
+        } else if (this.contains_key(condition, 'mist')) {
+            clothes = type_wardrobe.mist
+        } else if (this.contains_key(condition, 'wind')) {
+            clothes = type_wardrobe.wind
+        } else if (this.contains_key(condition, 'sun')) {
+            clothes = type_wardrobe.sun
         }
-    })
 
-    data = JSON.parse(data.body)
+        response = response.replace('<condition>', condition)
+        response = response.replace('<clothes>', clothes)
 
-    const condition = data.weather[0].main
-
-    if (contains_key(condition, 'rain') || contains_key(condition, 'shower')) {
-        clothes = type_wardrobe.rain
-    } else if (contains_key(condition, 'snow')) {
-        clothes = type_wardrobe.snow
-    } else if (contains_key(condition, 'mist')) {
-        clothes = type_wardrobe.mist
-    } else if (contains_key(condition, 'wind')) {
-        clothes = type_wardrobe.wind
-    } else if (contains_key(condition, 'sun')) {
-        clothes = type_wardrobe.sun
+        return {text: response}
     }
 
-    response = response.replace('<condition>', condition)
-    response = response.replace('<clothes>', clothes)
-
-    return {text: response}
+    contains_key(string, keyword) {
+        if (string.toUpperCase().includes(keyword.toUpperCase())) {
+            return true
+        }
+        return false
+    }
 }
 
-const intent = () => ({
-    keywords: ['wear today', 'clothes'], module: 'clothing'
-})
+module.exports = ClothingSkill;
 
-const examples = () => (
-    ['should I wear']
-)
-
-module.exports = {
-    get: clothing_resp,
-    intent,
-    examples
-}

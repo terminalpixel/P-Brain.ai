@@ -1,26 +1,28 @@
 const request = require('co-request')
+const PBrainSkill = require('../skill');
 
-const intent = () => ({
-    keywords: ['tell me a joke', 'say something funny', 'make me laugh'],
-    module: 'joke'
-})
+class JokeSkill extends PBrainSkill {
+    constructor() {
+        super('joke');
+    }
 
-function * joke_resp(query) {
-    const joke_url = 'https://api.chucknorris.io/jokes/random'
+    keywords() {
+        return ['tell me a joke', 'say something funny', 'make me laugh']
+    }
 
-    let data = yield request(joke_url)
+    examples() {
+        return ['Tell a joke.', 'Make me laugh.', 'Say something funny.'];
+    }
 
-    data = JSON.parse(data.body)
+    * get(query) {
+        const joke_url = 'https://api.chucknorris.io/jokes/random'
 
-    return {text: data.value}
+        let data = yield request(joke_url)
+
+        data = JSON.parse(data.body)
+
+        return {text: data.value}
+    }
 }
 
-const examples = () => (
-    ['Tell a joke.', 'Make me laugh.', 'Say something funny.']
-)
-
-module.exports = {
-    get: joke_resp,
-    intent,
-    examples
-}
+module.exports = JokeSkill;

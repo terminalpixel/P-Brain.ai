@@ -7,7 +7,11 @@ const getDirectories = srcpath =>
     fs.readdirSync(srcpath).filter(file =>
         fs.statSync(path.join(srcpath, file)).isDirectory())
 
-const skills = []
+let skills = []
+
+function addSkill(skill) {
+    skills.push(skill);
+}
 
 function * loadSkills() {
     const skills_dir = __dirname.replace('/api', '')
@@ -15,9 +19,10 @@ function * loadSkills() {
 
     for (let i = 0; i < dirs.length; i++) {
         const dir = dirs[i]
-        const skill = require(`./${dir}`)
-        skill.name = dir
-        skills.push(skill)
+        let skill = require(`./${dir}`)
+        if (typeof skill === 'function' && /^\s*class\s+/.test(skill.toString())) {
+            new skill();
+        }
     }
 }
 
@@ -35,6 +40,7 @@ function getSkills() {
 }
 
 module.exports = {
+    addSkill,
     loadSkills,
     getSkills,
     registerClient

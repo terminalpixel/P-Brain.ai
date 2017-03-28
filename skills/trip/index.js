@@ -1,25 +1,27 @@
-const natural = require('natural')
+const PBrainSkill = require('../skill');
 
-const intent = () => ({
-    keywords: ['trip to qqqq'],
-    module: 'trip'
-})
+class TripSkill extends PBrainSkill {
+    constructor() {
+        super('trip');
+    }
 
-const examples = () => (
-    ['Let\'s go on a trip.', 'Let\'s go to Mordor.']
-)
+    keywords() {
+        return ['trip to qqqq']
+    }
 
-const isHobbit = query =>
-    query.includes('mordor') || query.includes('tomorrow')
+    examples() {
+        return ['Let\'s go on a trip.', 'Let\'s go to Mordor.']
+    }
 
-function * tripResponse(query) {
-    return {text: isHobbit(query) ?
+    isHobbit(query) {
+        query.includes('mordor') || query.includes('tomorrow')
+    }
+
+    * get(query) {
+        return {text: this.isHobbit(query) ?
         'One does not simply walk into Mordor.' :
         `Sorry, I dont understand ${query}`}
+    }
 }
 
-module.exports = {
-    get: tripResponse,
-    intent,
-    examples
-}
+module.exports = TripSkill;

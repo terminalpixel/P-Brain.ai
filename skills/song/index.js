@@ -1,39 +1,42 @@
 const yt = require('./youtube')
+const PBrainSkill = require('../skill');
 
-function hard_rule(query, breakdown) {
-    return query.trim().toLowerCase().startsWith('play')
-}
-
-function * song_resp(query) {
-    query = query.replace('play', '')
-    let track = query.split('by')[0].trim()
-    let artist = query.split('by')[1]
-
-    if (query.includes('what is love')) {
-        track = 'what is love'
-        artist = 'Haddaway'
+class SongSkill extends PBrainSkill {
+    constructor() {
+        super('time');
     }
 
-    if (!artist || artist === '') {
-        artist = ''
-    } else {
-        artist = artist.trim()
+    hardRule(query, breakdown) {
+        return query.trim().toLowerCase().startsWith('play')
     }
 
-    const data = yield yt.get(track, artist)
-    if (data) {
-        return {id: data.id, text: `Playing ${data.title}.`, url: `https://www.youtube.com/watch?v=${data.id}`}
+    examples() {
+        return ['Play Everybody Knows by Leonard Cohen'];
     }
-    return {text: 'Could not play song.'}
+
+    * get(query) {
+        query = query.replace('play', '')
+        let track = query.split('by')[0].trim()
+        let artist = query.split('by')[1]
+
+        if (query.includes('what is love')) {
+            track = 'what is love'
+            artist = 'Haddaway'
+        }
+
+        if (!artist || artist === '') {
+            artist = ''
+        } else {
+            artist = artist.trim()
+        }
+
+        const data = yield yt.get(track, artist)
+        if (data) {
+            return {id: data.id, text: `Playing ${data.title}.`, url: `https://www.youtube.com/watch?v=${data.id}`}
+        }
+        return {text: 'Could not play song.'}
+    }
 }
 
-// These act as unit tests rather than training data because the skill supplies no intent.
-const examples = () => (
-    ['Play Everybody Knows by Leonard Cohen']
-)
+module.exports = SongSkill;
 
-module.exports = {
-    get: song_resp,
-    hard_rule,
-    examples
-}

@@ -1,28 +1,30 @@
-const request = require('co-request')
+const PBrainSkill = require('../skill');
 
-const intent = () => ({
-    keywords: ['start movie qqqq'],
-    module: 'movie'
-})
+class MovieSkill extends PBrainSkill {
+    constructor() {
+        super('movie');
+    }
 
-function * movie_resp(query) {
-    const term = query.split(' movie ')[1]
+    keywords() {
+        return ['start movie qqqq']
+    }
 
-    const movie_api = 'https://yts.ag/api/v2/list_movies.json?query_term=<query>&sort_by=peers'
+    examples() {
+        return ['Start movie Avatar.'];
+    }
 
-    let data = yield request(movie_api.replace('<query>', term))
+    * get(query) {
+        const term = query.split(' movie ')[1]
 
-    data = JSON.parse(data.body)
+        const movie_api = 'https://yts.ag/api/v2/list_movies.json?query_term=<query>&sort_by=peers'
 
-    return {url: data.data.movies[0].torrents[0].url}
+        let data = yield request(movie_api.replace('<query>', term))
+
+        data = JSON.parse(data.body)
+
+        return {url: data.data.movies[0].torrents[0].url}
+    }
 }
 
-const examples = () => (
-    ['Start movie Avatar.']
-)
+module.exports = MovieSkill;
 
-module.exports = {
-    get: movie_resp,
-    intent,
-    examples
-}
